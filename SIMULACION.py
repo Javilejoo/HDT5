@@ -57,7 +57,7 @@ random.seed(77)
 env = simpy.Environment()  # crear ambiente de simulacion
 initial_ram = simpy.Container(env, 100, init=100)  # crea el container de la ram
 initial_cpu = simpy.Resource(env, capacity=2)  # se crea el procesador con capacidad establecida
-initial_procesos = 200# cantidad de procesos a generar
+initial_procesos =200# cantidad de procesos a generar
 INTERVAL = 10 #modificara la velocidad en hacer tareas IMPORTANTE
 intervalINSTRUCTIONS = [1, 10]
 intervalRAM = [1, 10]
