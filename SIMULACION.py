@@ -53,12 +53,12 @@ def proceso(nombre, env, memoria, cpu, llegada, cantidad_instrucciones, cantidad
     
 
 
-random.seed(10)
+random.seed(77)
 env = simpy.Environment()  # crear ambiente de simulacion
 initial_ram = simpy.Container(env, 100, init=100)  # crea el container de la ram
-initial_cpu = simpy.Resource(env, capacity=1)  # se crea el procesador con capacidad establecida
-initial_procesos = 25 # cantidad de procesos a generar
-INTERVAL = 1 #modificara la velocidad en hacer tareas IMPORTANTE
+initial_cpu = simpy.Resource(env, capacity=2)  # se crea el procesador con capacidad establecida
+initial_procesos = 200# cantidad de procesos a generar
+INTERVAL = 10 #modificara la velocidad en hacer tareas IMPORTANTE
 intervalINSTRUCTIONS = [1, 10]
 intervalRAM = [1, 10]
 tiempo_total = 0
@@ -80,3 +80,4 @@ def SOURCE(env, initial_procesos, INTERVAL, initial_ram,initial_cpu,  intervalIN
 env.process(SOURCE(env, initial_procesos, INTERVAL, initial_ram,initial_cpu,  intervalINSTRUCTIONS, intervalRAM))
 env.run()
 print('tiempo promedio %d ' % (tiempo_total / initial_procesos))
+print('tiempo promedio ' + str(tiempo_total / initial_procesos))
