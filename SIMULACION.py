@@ -34,13 +34,11 @@ def proceso(nombre, env, memoria, cpu, llegada, cantidad_instrucciones, cantidad
 
             # Ya tiene procesador
             print('%s proceso en estado RUNNING fue atendido en tiempo -> %d cantidad ram %d, Instrucciones pendientes %d ram disponible %d' % (nombre, env.now, cantidad_ram, cantidad_instrucciones, memoria.level))
-            if  cantidad_instrucciones >= 0:
+            if  cantidad_instrucciones > 0:
                 numeroRandom = random.randint(1, 2)
                 if numeroRandom == 1:
                     yield env.timeout(1)
                     print('%s proceso en estado WAITING(haciendo operaciones de I/O..) fue atendido en tiempo -> %d cantidad ram %d, Instrucciones pendientes %d ram disponible %d' % (nombre, env.now, cantidad_ram, cantidad_instrucciones, memoria.level))
-                else:
-                    pass
             else:
                 # Cuando ya finaliza devuelve la memoria utilizada
                 yield memoria.put(cantidad_ram)
@@ -57,17 +55,28 @@ def proceso(nombre, env, memoria, cpu, llegada, cantidad_instrucciones, cantidad
 
 random.seed(10)
 env = simpy.Environment()  # crear ambiente de simulacion
-initial_ram = simpy.Container(env, 30, init=30)  # crea el container de la ram
+initial_ram = simpy.Container(env, 100, init=100)  # crea el container de la ram
 initial_cpu = simpy.Resource(env, capacity=1)  # se crea el procesador con capacidad establecida
-initial_procesos = 2 # cantidad de procesos a generar
+initial_procesos = 25 # cantidad de procesos a generar
+INTERVAL = 1 #modificara la velocidad en hacer tareas IMPORTANTE
+intervalINSTRUCTIONS = [1, 10]
+intervalRAM = [1, 10]
 tiempo_total = 0
 
-for i in range(initial_procesos):
-    llegada = 0 #Todos los procesos llegan al mismo tiempo
-    cantidad_instrucciones = random.randint(1, 10)  # cantidad de operaciones por proceso
-    UsoRam = random.randint(1, 10)  # cantidad de ram que requiere cada proceso
-    env.process(proceso('proceso %d' % i, env, initial_ram, initial_cpu, llegada, cantidad_instrucciones, UsoRam))
+
+
+def SOURCE(env, initial_procesos, INTERVAL, initial_ram,initial_cpu,  intervalINSTRUCTIONS, intervalRAM):
+    for i in range(initial_procesos):
+        llegada = 0 #Todos los procesos llegan al mismo tiempo
+        cantidad_instrucciones = random.randint(1, 10)  # cantidad de operaciones por proceso
+        UsoRam = random.randint(1, 10)  # cantidad de ram que requiere cada proceso
+        env.process(proceso('proceso %d' % i, env, initial_ram, initial_cpu, llegada, cantidad_instrucciones, UsoRam))
+        #para que sea exponencial
+        t = random.expovariate(1.0 / INTERVAL)
+        yield env.timeout(t)
+
 
 # correr la simulacion
+env.process(SOURCE(env, initial_procesos, INTERVAL, initial_ram,initial_cpu,  intervalINSTRUCTIONS, intervalRAM))
 env.run()
 print('tiempo promedio %d ' % (tiempo_total / initial_procesos))
